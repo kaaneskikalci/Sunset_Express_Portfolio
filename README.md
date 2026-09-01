@@ -15,8 +15,8 @@ and camera, carrying and jumping behaviour, and the network architecture with it
 prediction and synchronisation. Art, level content and part of the design belonged to
 the rest of the team.
 
-- **Case study:** https://kaan-portfolio-three.vercel.app/dev/sunset-express
-- **Technical postmortem:** https://kaan-portfolio-three.vercel.app/files/sunset-express-technical-postmortem.pdf
+- **Case study:** https://kaaneskikalci.com/dev/sunset-express
+- **Technical postmortem:** https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf
 
 *Internal working / repository name during development: `coffin`.*
 
