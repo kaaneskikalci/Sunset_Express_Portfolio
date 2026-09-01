@@ -41,9 +41,14 @@ So this will not compile as-is. It is here to be read, not built.
 | `ProjectSettings/DynamicsManager.asset` | `m_SimulationMode: 2` — Unity never steps physics on its own |
 
 That last one is the whole architecture in one line. Networked physics is an ordering
-problem before it is a physics problem: the server and the client have to solve the
-same input in the same order on the same step, so the simulation step was handed
-entirely to FishNet's tick loop rather than left to Unity's own fixed update.
+problem before it is a physics problem, so the simulation step was handed entirely to
+FishNet's tick loop rather than left to Unity's own fixed update.
+
+Authority is split deliberately. Players are client-predicted and reconciled against
+the server. The coffin is not predicted at all — it is simulated by the host and
+replicated to clients, because handing authority to whoever grabs it falls apart the
+moment two people hold it at once. Both halves depend on every machine stepping the
+simulation in the same order, which is what the tick pipeline provides.
 
 The postmortem linked above covers the tick pipeline, the force-band locomotion model,
 the shared-body connection between two carriers, the synchronised-jump fix, and the
