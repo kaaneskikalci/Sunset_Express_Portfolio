@@ -13,15 +13,21 @@ Your crew runs a funeral service that takes the jobs nobody else will: pick a da
 
 ## Design pillars
 
-These come from the team's GDD. Code comments cite its section numbers throughout.
+From the team's [GDD v0.3](https://kaaneskikalci.com/files/sunset-express-gdd-en.pdf) (July 2026), section 1.4:
 
-- **Readable chaos (GDD 1.4).** Every failure has a trigger players can learn, such as a tilt angle, an impact or a sustained condition. Nothing is random.
-- **Difficulty from physics, not multipliers (GDD 4.5).** Each character has a fixed muscle force, so the coffin's mass is what slows the team down, and extra carriers genuinely make it lighter.
-- **Release always works (GDD 6.5).** Letting go is a panic button that fires instantly, whatever else is happening.
-- **Watch the coffin, not the HUD (GDD 13.2).** There is no strain bar, only a shaking hand icon when a grip is close to breaking.
-- **No soft-locks.** Damage can destroy the lid but never the coffin body.
+1. **Fair jank.** Every fall should be funny but feel like your own fault: physics about 90% predictable, 10% chaotic.
+2. **The coffin is the fifth player.** Its centre of mass shifts, the corpse moves inside and the lid opens. As just a heavy box, it would be any other co-op carrying game.
+3. **Coordination comedy.** Every obstacle is easy alone and a nightmare together.
+4. **Modular contracts.** A catalogue of self-contained jobs replaces a linear story, and every corpse is a mechanical variation.
+5. **Small scope, high polish.** A few excellent contracts beat many mediocre ones, so the Early Access set was fixed at four.
 
-<!-- TODO(Kaan): confirm these are the pillars you want to present, or swap in the GDD's own wording. -->
+The code turns these into hard rules, and its comments cite the GDD sections:
+
+- **Readable triggers (1.4).** Every failure has a cause players can learn, such as a tilt angle, an impact or a sustained condition. Nothing is random.
+- **Difficulty from physics, not multipliers (4.5).** Each character's movement force is fixed, so the coffin's mass is what slows the team, and extra carriers genuinely make it lighter.
+- **Release always works (6.5).** Letting go is a panic button that fires instantly, whatever else is happening.
+- **Watch the coffin, not the HUD (13.2).** There is no strain bar, only a shaking hand icon when a grip is close to breaking.
+- **No soft-locks (4.6).** Damage can destroy the lid but never the coffin body.
 
 ## Core loop
 
@@ -60,21 +66,33 @@ Payment and end-of-job stats were designed but deliberately left out until the e
 I was responsible for game design alongside gameplay and network programming: coffin physics, the grab/release/break systems, corpse simulation, player controls and camera, carrying and jumping, and the network architecture with its prediction and synchronisation. Art, level content and part of the design belonged to the rest of the team.
 
 <!-- TODO(Kaan): credit teammates (names/roles) and confirm which folders are yours. Comments in GameLoop/ and UI/ refer to "Kaan's file" in the third person, suggesting a teammate wrote parts of them. -->
-<!-- TODO(Kaan): add 1–2 design decisions you personally drove (GDD sections you wrote, playtest calls you made). -->
+
+Two design calls in the systems I owned:
+
+- **Mass, not a speed penalty.** Playtesters said the coffin felt too light. The easy fix was a speed penalty while carrying. Instead, movement became force-limited: a force band whose floor derives from mass and preserves the unloaded feel, and whose ceiling sets carrying capacity. Now the coffin's real mass slows the team, and the GDD 4.5 rule stays intact.
+- **Tolerate the group jump, don't weaken it.** Two players jumping together at first broke every grip. Rather than reduce jump force, for a 0.4 s window the break threshold doubles and the joint spring stiffens threefold, so the impulse lifts the coffin instead of tearing the grips loose.
 
 ## Playtest changes (Aug 2026)
 
-Code comments record several changes made after playtests:
+Code comments and the case study record several changes made after playtests:
 - Removed mouse-wheel raise/lower. It added no meaningful feel.
 - Split the grip warning from a single 70% threshold into three tiers.
 - Corpse ejection now needs a *sustained* tilt. Single violent frames were dumping bodies unreadably.
 - Weakened the solo carry-jump and stiffened joints so group jumps actually lift the coffin.
+- Stopped tuning lid-damage values once it turned out the hinge spring behind that behaviour wasn't active, so the result could never appear.
 
 ## Why development stopped
 
-The prototype passed its internal Stage 0 feel test. Even so, the team grew less confident that the interaction had enough depth to sustain a full game. An active-ragdoll pivot also proved incompatible with the deterministic, tick-ordered architecture the game relied on. The [technical postmortem](https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf) covers the three failed attempts.
+The prototype passed its internal Stage 0 feel test. Even so, the team grew less confident that the interaction had enough depth to sustain a full game. An active-ragdoll pivot also proved incompatible with the deterministic, tick-ordered architecture the game relied on. The [technical postmortem](https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf) covers the three failed attempts. Stopping was a production decision: we chose not to keep investing in content and technical fixes before the underlying loop had proven worth scaling.
 
-<!-- TODO(Kaan): 3–4 bullets on what you learned as a designer. -->
+What I learned:
+
+- **Validate the loop, not just the interaction.** A good thirty seconds is not evidence of a good twenty minutes. We proved the coffin was fun to handle, not that carrying it contract after contract could sustain a game.
+- **Check a feature against the constraint holding the game up.** Determinism was load-bearing here, and the ragdoll pivot cut straight through it. A two-day spike in an isolated scene would have answered the risky question before two weeks went into it.
+- **Separate tuning problems from architectural ones.** When repeated parameter changes stop improving behaviour, the model is the suspect. Diagnose the system before tuning it.
+- **Cut the rollback branch before the pivot.** Ours was created after things had already gone sideways.
+
+Technical difficulty and design quality are different problems. We solved hard engineering challenges and still didn't have a game worth finishing.
 
 ## Media
 
@@ -84,7 +102,7 @@ The prototype passed its internal Stage 0 feel test. Even so, the team grew less
 | *TODO(Kaan): GIF – two players carrying* | *TODO(Kaan): GIF – corpse slides, lid pops* |
 | *TODO(Kaan): screenshot – contract board* | *TODO(Kaan): screenshot – funeral report* |
 
-**Case study:** https://kaaneskikalci.com/dev/sunset-express · **Postmortem (PDF):** https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf
+**Case study:** https://kaaneskikalci.com/dev/sunset-express/ · **GDD v0.3 (PDF):** https://kaaneskikalci.com/files/sunset-express-gdd-en.pdf · **Technical postmortem (PDF):** https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf
 
 ## Repository guide
 
@@ -98,7 +116,6 @@ The prototype passed its internal Stage 0 feel test. Even so, the team grew less
 | [`GameLoop/`](Assets/_Game/Scripts/Runtime/GameLoop) | Contracts, grave/delivery, respawn, lethal zones |
 | [`Obstacles/`](Assets/_Game/Scripts/Runtime/Obstacles) · [`Networking/`](Assets/_Game/Scripts/Runtime/Networking) · [`UI/`](Assets/_Game/Scripts/Runtime/UI) | Obstacles · scene flow and Steam lobby · HUD, menus, report |
 
-**GDD:** not included. Code comments are in Turkish and cite GDD sections (e.g. "GDD 4.3") and files like `Docs/GDD/02-coffin-physics.md`.
-<!-- TODO(Kaan): publish a GDD excerpt (e.g. docs/gdd/) or link it from the case study. -->
+**GDD:** not in this repo. The English GDD v0.3 is on my site as a [PDF](https://kaaneskikalci.com/files/sunset-express-gdd-en.pdf), alongside the [case study](https://kaaneskikalci.com/dev/sunset-express/) and the [technical postmortem](https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf). Code comments are in Turkish and cite its section numbers (e.g. "GDD 4.5").
 
-*Internal working name during development: `coffin`. Licence: [MIT](LICENSE), covering the source in this repository only.*
+*Internal working and repository name: `Coffin`. Licence: [MIT](LICENSE), covering the source in this repository only.*
