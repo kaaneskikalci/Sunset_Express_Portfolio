@@ -2,7 +2,7 @@
 
 > A co-op physics game about carrying a coffin, with a corpse sliding around inside it, to a grave across a hostile level.
 
-<!-- TODO(Kaan): hero GIF, e.g. the team fumbling the coffin across the seesaw bridge. Suggested path: docs/media/hero.gif -->
+![Sunset Express](docs/media/cover.jpg)
 
 **Genre:** co-op physics comedy · **Players:** 2, designed to scale to 4 · **Platform:** PC (Steam)
 **Tech:** Unity 6 (URP), C#, Fish-Networking, Steamworks.NET · **Team:** 3, ~6 weeks, mid-2026 · **Status:** discontinued Aug 2026
@@ -65,7 +65,9 @@ Payment and end-of-job stats were designed but deliberately left out until the e
 
 I was responsible for game design alongside gameplay and network programming: coffin physics, the grab/release/break systems, corpse simulation, player controls and camera, carrying and jumping, and the network architecture with its prediction and synchronisation. Art, level content and part of the design belonged to the rest of the team.
 
-<!-- TODO(Kaan): credit teammates (names/roles) and confirm which folders are yours. Comments in GameLoop/ and UI/ refer to "Kaan's file" in the third person, suggesting a teammate wrote parts of them. -->
+Ozanay was the second gameplay programmer: the core loop (contracts, delivery, reports), the seesaw bridge and moving platform obstacles, the HUD/UI and the economy. Baran did the 3D art, level greyboxing and shaders. Part of the design came from them too.
+
+AI-assisted development (Claude Code, Codex).
 
 Two design calls in the systems I owned:
 
@@ -94,13 +96,22 @@ What I learned:
 
 Technical difficulty and design quality are different problems. We solved hard engineering challenges and still didn't have a game worth finishing.
 
+## Post-cancellation polish (Nov 2026)
+
+After the project was cancelled, I went back for a short polish round so the build could be recorded for my portfolio. It lives on a separate branch of the private repository; this mirror still shows the August 2026 code. The core loop, physics and network architecture did not change, and no mechanics were added.
+
+- **Both test levels can be finished.** The second test level had no delivery point, so its contract could never end; one was added. The grave trigger rejected a coffin resting at an angle, so delivery never completed; its volume was enlarged.
+- **Readable state.** The delivery sign shows each step ("Let go of the coffin (E)", "Hold still…", "Delivering…", "Delivered."). A real grip break flashes "GRIP LOST", a hand icon replaces the placeholder grip warning, and the death screen reads "OFF THE CLOCK" with "Respawning…".
+- **Clean presentation.** A corpse model replaces the capsule (same physics), network debug overlays are off, player-facing text is in English, and the contracts were renamed.
+- **Small fixes.** Dead players can no longer grab the coffin, larger kill zones stop falling players from getting stuck alive, and movement is locked while the contract board or report is open.
+
+Left alone on purpose: the August tuning values, the lid behaviour, and recovering a coffin that falls off the map. Changing them would alter gameplay or need new network code. There is still no sound.
+
+**Verified:** compiles cleanly in Editor and release builds. In play, only delivery was confirmed working (two players, 7 Nov 2026); the rest has not been checked in play yet.
+
 ## Media
 
-<!-- TODO(Kaan): no images exist in this repo yet. Add them under docs/media/ and replace the placeholders below. -->
-| | |
-|---|---|
-| *TODO(Kaan): GIF – two players carrying* | *TODO(Kaan): GIF – corpse slides, lid pops* |
-| *TODO(Kaan): screenshot – contract board* | *TODO(Kaan): screenshot – funeral report* |
+**Playtest cut (Aug 2026, 78 s):** https://www.youtube.com/watch?v=mcXKjBXpUOE
 
 **Case study:** https://kaaneskikalci.com/dev/sunset-express/ · **GDD v0.3 (PDF):** https://kaaneskikalci.com/files/sunset-express-gdd-en.pdf · **Technical postmortem (PDF):** https://kaaneskikalci.com/files/sunset-express-technical-postmortem.pdf
 
